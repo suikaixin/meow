@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import Screen from '@/components/Screen';
 import PowerOn from '@/components/PowerOn';
+import BootingScreen from '@/components/BootingScreen';
 import { appNames } from '@/config/appConfig';
 
 const Container = styled.div`
@@ -19,8 +20,9 @@ const Header = styled.header`
 `;
 
 const Slogan = styled.h1`
-  font-size: 36px;
+  font-size: 48px;
   color: #333;
+  margin-top: 20px;
   margin-bottom: 20px;
 `;
 
@@ -46,19 +48,17 @@ export default function Home() {
   // 处理开机
   const handlePowerOn = async (repoUrl: string) => {
     setIsBooting(true);
+    fetchSSEData(repoUrl);
+  };
+  
+  // 处理启动完成
+  const handleBootComplete = () => {
+    setPower('on');
+    setIsBooting(false);
+    setIsWorking(true);
     
-    // 模拟开机动画
-    setTimeout(() => {
-      setPower('on');
-      setIsBooting(false);
-      setIsWorking(true);
-      
-      // 默认打开terminal和output
-      setActiveApps(['terminal', 'output', 'browser']);
-      
-      // 调用SSE API
-      fetchSSEData(repoUrl);
-    }, 2000);
+    // 默认打开的
+    setActiveApps(['output', 'browser']);
   };
   
   // 处理应用切换
@@ -79,11 +79,7 @@ export default function Home() {
   
   // 调用SSE API
   const fetchSSEData = (repoUrl: string) => {
-    // 提取仓库信息
-    const repoInfo = repoUrl.split('/');
-    const site = repoUrl;
-    
-    console.log(`[SSE] 开始获取数据，仓库地址: ${repoUrl}`);
+    console.log(`[SSE] 开始处理仓库: ${repoUrl}`);
     
     // 初始化应用内容
     appNames.forEach(appName => {
@@ -93,23 +89,17 @@ export default function Home() {
         [appName]: []
       }));
     });
-
-    // 添加初始信息到browser
+    
+    // 更新browser内容为占位页面
     updateAppContent('browser', {
       type: 'site',
       content: 'https://poster.docmesh.tech'
     });
     
-    // 添加初始命令到terminal
-    updateAppContent('terminal', {
-      type: 'command',
-      content: `git clone ${repoUrl}`
-    });
-    
     // 添加初始信息到output
     updateAppContent('output', {
       type: 'info',
-      content: `开始处理仓库: ${repoUrl}`,
+      content: `Start to execute Task: ${repoUrl}`,
       timestamp: Date.now()
     });
     
@@ -126,7 +116,7 @@ export default function Home() {
           'Content-Type': 'application/json',
           'Accept': 'text/event-stream'
         },
-        body: JSON.stringify({ site: "https://github.com/octocat/Hello-World" })
+        body: JSON.stringify({ site: repoUrl })
       })
       .then(response => {
         if (!response.ok) {
@@ -184,6 +174,7 @@ export default function Home() {
               content: `SSE 连接错误: ${error.message}`,
               timestamp: Date.now()
             });
+            setIsWorking(false);
           });
         }
         
@@ -197,6 +188,7 @@ export default function Home() {
           content: `请求失败: ${error.message}`,
           timestamp: Date.now()
         });
+        setIsWorking(false);
       });
       
     } catch (error: any) {
@@ -206,6 +198,7 @@ export default function Home() {
         content: `连接错误: ${error.message}`,
         timestamp: Date.now()
       });
+      setIsWorking(false);
     }
   };
   
@@ -327,21 +320,27 @@ export default function Home() {
   const processFileData = (data: any) => {
     console.log('[File处理] 接收到数据:', data);
     
-    if (data.file_path && data.content) {
-      const fileName = data.file_path.split('/').pop() || '';
-      console.log(`[File处理] 添加文件: ${fileName}, 路径: ${data.file_path}`);
-      console.log(`[File处理] 文件内容长度: ${data.content.length} 字符`);
-      
-      updateAppContent('file', {
-        type: 'filename',
-        content: fileName,
-        filePath: data.file_path,
-        fileContent: data.content
-      });
+    if (data.file_path || data.content) {
+      if (data.file_path) {
+        console.log(`[File处理] 添加文件: ${data.file_path}`);
+        
+        updateAppContent('file', {
+          type: 'file-name',
+          content: data.file_path
+        });
+      }
+      if (data.content) {
+        console.log(`[File处理] 添加文件内容: 长度 ${data.content.length} 字符`);
+  
+        updateAppContent('file', {
+          type: 'file-info',
+          content: data.content
+        });
+      }
     } else if (data.observation) {
-      console.log('[File处理] 添加提示:', data.observation);
+      console.log('[File处理] 添加提示内容:', data.observation);
       updateAppContent('file', {
-        type: 'toast',
+        type: 'file-info',
         content: data.observation
       });
     } else {
@@ -386,6 +385,8 @@ export default function Home() {
         content: data.finish_reason,
         timestamp: Date.now()
       });
+
+      setIsWorking(false);
     }
     else {
       console.warn('[Output处理] 未识别的数据格式:', data);
@@ -408,11 +409,7 @@ export default function Home() {
   };
   
   return (
-    <Container>
-      <Header>
-        <Slogan>Tell Meow Your Task</Slogan>
-      </Header>
-      
+    <Container>      
       <Main>
         <Screen 
           key="main-screen"
@@ -425,6 +422,9 @@ export default function Home() {
         />
         {power === 'off' && !isBooting && (
           <PowerOn key="power-on" onPowerOn={handlePowerOn} />
+        )}
+        {isBooting && (
+          <BootingScreen key="booting-screen" onBootComplete={handleBootComplete} />
         )}
       </Main>
     </Container>

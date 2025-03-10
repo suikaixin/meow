@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { FaTimes, FaGithub, FaExternalLinkAlt } from 'react-icons/fa';
+import { FaGithub, FaExternalLinkAlt } from 'react-icons/fa';
 
 interface BrowserTab {
   id: string;
@@ -54,20 +54,6 @@ const TabTitle = styled.span`
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
-`;
-
-const CloseIcon = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 8px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  
-  &:hover {
-    background: #ddd;
-  }
 `;
 
 const URLBar = styled.div`
@@ -144,7 +130,7 @@ const OpenLinkButton = styled.a`
   display: flex;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(135deg, #6e45e2, #88d3ce);
+  background: #333;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -203,7 +189,7 @@ const renderNonEmbeddableSiteMessage = (url: string) => {
         这是一种安全措施，用于保护用户免受点击劫持和其他类型的攻击。
       </MessageText>
       <OpenLinkButton href={url} target="_blank" rel="noopener noreferrer">
-        <FaExternalLinkAlt size={14} /> 在新标签页中打开
+        <FaExternalLinkAlt size={14} /> 在外部打开
       </OpenLinkButton>
     </MessageContainer>
   );
@@ -222,37 +208,21 @@ const Browser: React.FC<BrowserProps> = ({ content }) => {
   
   // 每当content更新时，添加新的tab
   React.useEffect(() => {
-    if (content && content.length > 0) {
-      const newSites = content.filter(item => item.type === 'site')
-        .map(item => item.content)
-        .filter(url => !tabs.some(tab => tab.url === url));
+    const currentUrls = new Set(tabs.map(tab => tab.url));
+    const newSites = content
+      .filter(item => item.type === 'site')
+      .filter(item => !currentUrls.has(item.content));
+    
+    if (newSites.length > 0) {
+      const newTabs = newSites.map(item => ({
+        id: `tab-${Date.now()}-${Math.random()}`,
+        url: item.content
+      }));
       
-      if (newSites.length > 0) {
-        const newTabs = newSites.map((url, index) => ({
-          id: `tab-${tabs.length + index}`,
-          url
-        }));
-        
-        setTabs(prev => [...prev, ...newTabs]);
-        if (!activeTabId && newTabs.length > 0) {
-          setActiveTabId(newTabs[0].id);
-        }
-      }
+      setTabs(prev => [...prev, ...newTabs]);
+      setActiveTabId(newTabs[newTabs.length - 1].id);
     }
-  }, [content, tabs, activeTabId]);
-  
-  const handleCloseTab = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    
-    const newTabs = tabs.filter(tab => tab.id !== id);
-    setTabs(newTabs);
-    
-    if (activeTabId === id && newTabs.length > 0) {
-      setActiveTabId(newTabs[0].id);
-    } else if (newTabs.length === 0) {
-      setActiveTabId('');
-    }
-  };
+  }, [JSON.stringify(content)]);
   
   const activeTab = tabs.find(tab => tab.id === activeTabId);
   
@@ -266,9 +236,6 @@ const Browser: React.FC<BrowserProps> = ({ content }) => {
             onClick={() => setActiveTabId(tab.id)}
           >
             <TabTitle>{tab.url}</TabTitle>
-            <CloseIcon onClick={(e) => handleCloseTab(tab.id, e)}>
-              <FaTimes size={10} />
-            </CloseIcon>
           </Tab>
         ))}
       </TabBar>

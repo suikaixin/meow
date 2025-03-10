@@ -1,13 +1,14 @@
 import { 
   FaTerminal, 
-  FaGlobe, 
+  FaChrome, 
   FaFolder, 
   FaProjectDiagram, 
-  FaFileAlt 
+  FaFolderOpen,
+  FaJournalWhills
 } from 'react-icons/fa';
 import { IconType } from 'react-icons';
 
-export type ContentType = 'command' | 'stderr' | 'stdout' | 'site' | 'filename' | 'toast' | 'fileurl' | 'info' | 'error';
+export type ContentType = 'command' | 'stderr' | 'stdout' | 'site' | 'file-name' | 'file-info' | 'drawio-url' | 'info' | 'error';
 
 export interface AppConfig {
   name: string;
@@ -23,22 +24,22 @@ export const appConfigs: Record<string, AppConfig> = {
   },
   browser: {
     name: 'Browser',
-    icon: FaGlobe,
+    icon: FaChrome,
     contentTypes: ['site']
   },
   file: {
     name: 'File',
-    icon: FaFolder,
-    contentTypes: ['filename', 'toast']
+    icon: FaFolderOpen,
+    contentTypes: ['file-info', 'file-name']
   },
   drawio: {
     name: 'DrawIO',
-    icon: FaProjectDiagram,
-    contentTypes: ['fileurl']
+    icon:  FaProjectDiagram ,
+    contentTypes: ['drawio-url']
   },
   output: {
     name: 'Diary',
-    icon: FaFileAlt,
+    icon: FaJournalWhills,
     contentTypes: ['info', 'error']
   }
 };

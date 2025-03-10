@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 interface TerminalItem {
@@ -47,8 +47,16 @@ const StderrLine = styled.div`
 `;
 
 const Terminal: React.FC<TerminalProps> = ({ content }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    }
+  }, [content]);
+
   return (
-    <TerminalContainer>
+    <TerminalContainer ref={containerRef}>
       {content && content.map((item, index) => {
         switch (item.type) {
           case 'command':

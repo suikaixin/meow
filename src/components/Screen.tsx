@@ -16,14 +16,16 @@ interface ScreenProps {
 
 const ScreenContainer = styled.div<{ $power: 'on' | 'off' }>`
   width: 100%;
-  height: 80vh;
+  min-width: 1000px;
+  height: 100;
+  min-height: 800px;
   border-radius: 12px;
-  border: 2px solid #888;
+  border: 8px solid black;
   overflow: hidden;
   position: relative;
   background: ${({ $power }) => $power === 'on' 
-    ? 'linear-gradient(135deg, #6e45e2, #88d3ce)'
-    : '#000'
+    ? 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)'
+    : 'linear-gradient(135deg, #666666 0%, #333333 100%)'
   };
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   transition: all 0.5s ease;
@@ -31,13 +33,19 @@ const ScreenContainer = styled.div<{ $power: 'on' | 'off' }>`
 
 const MeowAvatar = styled.div<{ $isWorking: boolean }>`
   position: absolute;
-  bottom: 100px;
+  bottom: 20px;
   right: 20px;
-  width: 150px;
-  height: 150px;
+  width: 240px;
+  height: 240px;
   z-index: 999;
-  opacity: ${({ $isWorking }) => $isWorking ? 1 : 0};
+  opacity: ${({ $isWorking }) => $isWorking ? 1 : 1};
   transition: opacity 0.3s ease;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
 `;
 
 const ErrorMessage = styled.div`
@@ -77,14 +85,18 @@ const Screen: React.FC<ScreenProps> = ({
               onClose={() => onCloseApp(appName)}
             />
           ))}
-          <MeowAvatar $isWorking={isWorking}>
-            <Image 
-              src={isWorking ? '/images/cat-key.gif' : '/images/cat-tea.gif'} 
-              alt="Meow Avatar" 
-              width={150} 
-              height={150}
-            />
-          </MeowAvatar>
+         </>
+      )}
+      <MeowAvatar $isWorking={isWorking}>
+        <Image 
+          src={isWorking ? '/images/cat-key.gif' : '/images/cat-tea.gif'} 
+          alt="Meow Avatar" 
+          width={200} 
+          height={200}
+        />
+      </MeowAvatar>
+      {power === 'on' && (
+        <>
           <Dock 
             apps={appNames}
             activeApps={safeActiveApps}

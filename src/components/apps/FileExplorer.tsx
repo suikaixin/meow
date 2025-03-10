@@ -3,10 +3,8 @@ import styled from 'styled-components';
 import { FaFile, FaFolder } from 'react-icons/fa';
 
 interface FileItem {
-  type: 'filename' | 'toast';
+  type: 'file-name' | 'file-info';
   content: string;
-  filePath?: string;
-  fileContent?: string;
 }
 
 interface FileExplorerProps {
@@ -97,18 +95,17 @@ const NoSelection = styled.div`
 
 const FileExplorer: React.FC<FileExplorerProps> = ({ content }) => {
   const [files, setFiles] = useState<FileItem[]>([]);
-  const [toasts, setToasts] = useState<string[]>([]);
-  const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
+  const [infoContent, setInfoContent] = useState<string[]>([]);
   
   useEffect(() => {
     if (content) {
       // 处理文件
-      const newFiles = content.filter(item => item.type === 'filename');
+      const newFiles = content.filter(item => item.type === 'file-name');
       setFiles(prevFiles => {
         const uniqueFiles = [...prevFiles];
         newFiles.forEach(newFile => {
           const existingIndex = uniqueFiles.findIndex(
-            f => f.type === 'filename' && f.filePath === newFile.filePath
+            f => f.type === 'file-name' && f.content === newFile.content
           );
           
           if (existingIndex >= 0) {
@@ -120,20 +117,16 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ content }) => {
         return uniqueFiles;
       });
       
-      // 处理通知
-      const newToasts = content
-        .filter(item => item.type === 'toast')
+      // 处理预览区内容（file-info 类型）
+      const newInfos = content
+        .filter(item => item.type === 'file-info')
         .map(item => item.content);
       
-      if (newToasts.length > 0) {
-        setToasts(prev => [...prev, ...newToasts]);
+      if (newInfos.length > 0) {
+        setInfoContent(prev => [...prev, ...newInfos]);
       }
     }
   }, [content]);
-  
-  const handleFileClick = (file: FileItem) => {
-    setSelectedFile(file);
-  };
   
   const getFileExtension = (filename: string) => {
     return filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);
@@ -146,14 +139,13 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ content }) => {
           {files.map((file, index) => (
             <FileListItem 
               key={index} 
-              $active={selectedFile === file}
-              onClick={() => handleFileClick(file)}
+              $active={false}
             >
               <FileIcon>
                 <FaFile />
               </FileIcon>
               <FileName>
-                {file.filePath ? file.filePath.split('/').pop() : file.content}
+                {file.content}
               </FileName>
             </FileListItem>
           ))}
@@ -161,18 +153,16 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ content }) => {
       </Sidebar>
       
       <PreviewArea>
-        {toasts.map((toast, index) => (
-          <Toast key={index}>{toast}</Toast>
-        ))}
-        
-        {selectedFile ? (
-          <PreviewContent>
-            {selectedFile.fileContent || '(无内容)'}
-          </PreviewContent>
+        {infoContent.length > 0 ? (
+          infoContent.map((info, index) => (
+            <PreviewContent key={index}>
+              {info || '(无内容)'}
+            </PreviewContent>
+          ))
         ) : (
           <NoSelection>
             <FaFolder size={40} color="#bbb" />
-            <p style={{ marginTop: 10 }}>选择一个文件以预览</p>
+            <p style={{ marginTop: 10 }}>暂无信息内容</p>
           </NoSelection>
         )}
       </PreviewArea>

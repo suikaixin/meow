@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { FaSmile, FaSadTear } from 'react-icons/fa';
 
@@ -90,6 +90,14 @@ const EmptyState = styled.div`
 `;
 
 const Output: React.FC<OutputProps> = ({ content }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    }
+  }, [content]);
+
   const entries = content?.map(item => {
     // 检查内容是否包含error关键字来确定类型
     const type = item.type === 'error' || 
@@ -115,7 +123,7 @@ const Output: React.FC<OutputProps> = ({ content }) => {
   });
   
   return (
-    <Container>
+    <Container ref={containerRef}>
       <JournalHeader>
         <JournalTitle>Meow Diary</JournalTitle>
         <JournalDate>{today}</JournalDate>
