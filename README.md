@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Meow Agent 桌面界面
 
-## Getting Started
+🐱 一个可爱的、交互式的虚拟桌面界面，用于展示 Agent Meow 的任务执行状态。这个项目使用 Next.js 构建，为用户提供了一个萌系的虚拟电脑界面，让您可以看到 Meow Agent 如何在其"小电脑"上工作。
 
-First, run the development server:
+## 🖥️ 功能特点
+
+- **拟物化的电脑界面**：包含开机动画、桌面和应用窗口
+- **多应用窗口**：支持多个应用程序同时运行，包括：
+  - 🖥️ 终端 (Terminal)：显示命令行操作
+  - 🌐 浏览器 (Browser)：展示网页内容
+  - 📁 文件浏览器 (File)：查看和管理文件
+  - 📊 图表工具 (DrawIO)：可视化图表
+  - 📔 日记 (Diary)：记录信息和错误
+- **实时状态更新**：通过 SSE (Server-Sent Events) 实时展示 Agent 的工作状态
+- **萌系界面**：可爱的设计和动画增强用户体验
+
+## 🚀 快速开始
+
+首先，安装依赖项：
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+然后，运行开发服务器：
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+在浏览器中打开 [http://localhost:3000](http://localhost:3000) 即可看到结果。
 
-## Learn More
+## 🔧 使用方法
 
-To learn more about Next.js, take a look at the following resources:
+1. 打开应用后，点击电源按钮启动 Meow Agent 的电脑
+2. 输入要处理的仓库或任务 URL
+3. 等待启动完成后，观察 Meow Agent 如何在不同的应用窗口中执行任务
+4. 您可以打开/关闭不同的应用窗口，重新排列窗口位置，以便更好地观察 Agent 的工作情况
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🛠️ 技术栈
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Next.js 
+- React
+- TypeScript
+- Styled Components
+- Server-Sent Events (SSE) 用于实时通信
 
-## Deploy on Vercel
+## 📝 开发计划
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- 添加更多可爱的交互动画
+- 支持更多类型的任务和应用程序
+- 改进 UI/UX 设计，增加更多萌系元素
+- 提供更多自定义选项
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+🐾 Meow Agent - 您的萌系 AI 助手！
