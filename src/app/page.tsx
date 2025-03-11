@@ -100,7 +100,7 @@ export default function Home() {
     // 添加初始信息到output
     updateAppContent('output', {
       type: 'info',
-      content: `Start to execute Task: ${repoUrl}`,
+      content: `Start to execute Task`,
       timestamp: Date.now()
     });
     
@@ -115,9 +115,18 @@ export default function Home() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'text/event-stream'
+          'Accept': 'text/event-stream',
+          'Connection': 'keep-alive',
+          'Cache-Control': 'no-cache',
+          // 强制使用HTTP/1.1协议
+          'X-HTTP-Version': 'HTTP/1.1'
         },
-        body: JSON.stringify({ site: repoUrl })
+        body: JSON.stringify({ site: repoUrl }),
+        // 明确指定不使用HTTP/2
+        cache: 'no-store',
+        keepalive: true,
+        // 设置较长的超时时间 (30秒)
+        signal: AbortSignal.timeout(3000000)
       })
       .then(response => {
         if (!response.ok) {
@@ -174,7 +183,7 @@ export default function Home() {
             console.error('[SSE] 读取流时出错:', error);
             updateAppContent('output', {
               type: 'error',
-              content: `SSE 连接错误: ${error.message}`,
+              content: `SSE connection error ${error.message}`,
               timestamp: Date.now()
             });
             setIsWorking(false);
@@ -188,7 +197,7 @@ export default function Home() {
         console.error('[SSE] 建立连接错误:', error);
         updateAppContent('output', {
           type: 'error',
-          content: `请求失败: ${error.message}`,
+          content: `Request failed ${error.message}`,
           timestamp: Date.now()
         });
         setIsWorking(false);
@@ -198,7 +207,7 @@ export default function Home() {
       console.error('[SSE] 异常:', error);
       updateAppContent('output', {
         type: 'error',
-        content: `连接错误: ${error.message}`,
+        content: `Connection error ${error.message}`,
         timestamp: Date.now()
       });
       setIsWorking(false);
@@ -333,7 +342,7 @@ export default function Home() {
 
       updateAppContent('output', {
         type:  'info',
-        content: `Upload file: ${data.file_path}`
+        content: `Upload file ${data.file_path}`
       });
     } else {
       console.warn('[File处理] 未识别的数据格式:', data);
