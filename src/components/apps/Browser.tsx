@@ -110,17 +110,19 @@ const MessageContainer = styled.div`
 
 const SiteIcon = styled.div`
   font-size: 48px;
-  margin-bottom: 20px;
+  margin-bottom: 0px;
   color: #333;
 `;
 
 const MessageTitle = styled.h3`
   margin-bottom: 10px;
-  font-size: 18px;
+  font-size: 16px;
   color: #333;
 `;
 
 const MessageText = styled.p`
+  font-size: 12px;
+  line-height: 1.5;
   margin-bottom: 20px;
   color: #666;
   max-width: 600px;
@@ -186,6 +188,7 @@ const renderNonEmbeddableSiteMessage = (url: string) => {
       <MessageTitle>无法嵌入此网站</MessageTitle>
       <MessageText>
         由于内容安全策略(CSP)限制，{url.includes('github.com') ? 'GitHub' : '此网站'} 不允许在iframe中嵌入。
+        <br />
         这是一种安全措施，用于保护用户免受点击劫持和其他类型的攻击。
       </MessageText>
       <OpenLinkButton href={url} target="_blank" rel="noopener noreferrer">
@@ -196,33 +199,32 @@ const renderNonEmbeddableSiteMessage = (url: string) => {
 };
 
 const Browser: React.FC<BrowserProps> = ({ content }) => {
-  const initialTabs: BrowserTab[] = content
-    ? content.filter(item => item.type === 'site').map((item, index) => ({
-        id: `tab-${index}`,
-        url: item.content
-      }))
-    : [];
+  // useEffect 里会处理所有的 content，所以这里初始化为空数组
+  const [tabs, setTabs] = useState<BrowserTab[]>([]);
+  const [activeTabId, setActiveTabId] = useState<string>('');
   
-  const [tabs, setTabs] = useState<BrowserTab[]>(initialTabs);
-  const [activeTabId, setActiveTabId] = useState<string>(initialTabs.length > 0 ? initialTabs[0].id : '');
-  
-  // 每当content更新时，添加新的tab
+  // 只在 content 变化时执行一次，完全替换标签页列表
   React.useEffect(() => {
-    const currentUrls = new Set(tabs.map(tab => tab.url));
-    const newSites = content
-      .filter(item => item.type === 'site')
-      .filter(item => !currentUrls.has(item.content));
+    if (!content || content.length === 0) {
+      return;
+    }
     
-    if (newSites.length > 0) {
-      const newTabs = newSites.map(item => ({
-        id: `tab-${Date.now()}-${Math.random()}`,
+    const siteContents = content.filter(item => item.type === 'site');
+    
+    if (siteContents.length > 0) {
+      const newTabs = siteContents.map((item, index) => ({
+        id: `tab-${index}`,
         url: item.content
       }));
       
-      setTabs(prev => [...prev, ...newTabs]);
-      setActiveTabId(newTabs[newTabs.length - 1].id);
+      setTabs(newTabs);
+      
+      // 如果没有活动标签页或活动标签页不在新的标签列表中，选择第一个标签
+      if (!activeTabId || !newTabs.find(tab => tab.id === activeTabId)) {
+        setActiveTabId(newTabs[0].id);
+      }
     }
-  }, [JSON.stringify(content)]);
+  }, [content, activeTabId]);
   
   const activeTab = tabs.find(tab => tab.id === activeTabId);
   

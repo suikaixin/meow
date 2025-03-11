@@ -35,6 +35,7 @@ const Main = styled.main`
 // 处理SSE数据的类型
 interface SSEData {
   app: string;
+  meta: any;
   data: any;
 }
 
@@ -121,6 +122,7 @@ export default function Home() {
       .then(response => {
         if (!response.ok) {
           console.error(`[SSE] 请求失败，状态码: ${response.status}`);
+          setIsWorking(false);
           throw new Error(`HTTP 错误 ${response.status}`);
         }
         
@@ -134,6 +136,7 @@ export default function Home() {
           reader.read().then(({ done, value }) => {
             if (done) {
               console.log('[SSE] 数据流读取完成');
+              setIsWorking(false);
               return;
             }
             
@@ -206,14 +209,18 @@ export default function Home() {
   const processSSEData = (data: SSEData) => {
     console.log(`[SSE处理] 开始处理数据:`, data);
     
-    const { app, data: appData } = data;
+    const { app: appName_temp, meta: metaData_temp, data: appData_tmp } = data;
     
-    if (!app || !appData) {
+    if (!appName_temp || !metaData_temp || !appData_tmp) {
       console.error('[SSE处理] 无效的数据格式:', data);
       return;
     }
     
-    console.log(`[SSE处理] 处理 ${app} 应用的数据:`, appData);
+    const appData = {...appData_tmp, ...metaData_temp};
+    console.log(`[SSE处理] 处理 ${appName_temp} 应用的数据:`, appData);
+
+    const app = appName_temp === 'diary' ? 'output' : appName_temp.toLowerCase();
+
     
     // 根据app类型处理数据
     switch (app) {
@@ -248,53 +255,26 @@ export default function Home() {
   const processTerminalData = (data: any) => {
     console.log('[Terminal处理] 接收到数据:', data);
     
-    if (data.command) {
-      console.log('[Terminal处理] 添加命令:', data.command);
+    if (data.operation === 'execute') {
+      console.log('[Terminal处理] 添加命令:', data.content);
       updateAppContent('terminal', {
         type: 'command',
-        content: data.command
+        content: data.content
       });
-    } else if (data.observation) {
-      // 如果data.observation是字符串，使用正则表达式提取stderr和stdout
-      if (typeof data.observation === 'string') {
-        // 提取stderr内容
-        const stderrMatch = data.observation.match(/stderr:([\s\S]*?)(?=stdout:|$)/);
-        if (stderrMatch && stderrMatch[1] && stderrMatch[1].trim()) {
-          const stderrContent = stderrMatch[1].trim();
-          console.log('[Terminal处理] 添加标准错误:', stderrContent.substring(0, 100) + (stderrContent.length > 100 ? '...' : ''));
-          updateAppContent('terminal', {
-            type: 'stderr',
-            content: stderrContent
-          });
-        }
-        
-        // 提取stdout内容
-        const stdoutMatch = data.observation.match(/stdout:([\s\S]*?)(?=stderr:|$)/);
-        if (stdoutMatch && stdoutMatch[1] && stdoutMatch[1].trim()) {
-          const stdoutContent = stdoutMatch[1].trim();
-          console.log('[Terminal处理] 添加标准输出:', stdoutContent.substring(0, 100) + (stdoutContent.length > 100 ? '...' : ''));
-          updateAppContent('terminal', {
-            type: 'stdout',
-            content: stdoutContent
-          });
-        }
-      } 
-      // 兼容旧版数据格式
-      else if (typeof data.observation === 'object') {
-        if (data.observation.stderr) {
-          console.log('[Terminal处理] 添加标准错误:', data.observation.stderr.substring(0, 100) + (data.observation.stderr.length > 100 ? '...' : ''));
-          updateAppContent('terminal', {
-            type: 'stderr',
-            content: data.observation.stderr
-          });
-        }
-        if (data.observation.stdout) {
-          console.log('[Terminal处理] 添加标准输出:', data.observation.stdout.substring(0, 100) + (data.observation.stdout.length > 100 ? '...' : ''));
-          updateAppContent('terminal', {
-            type: 'stdout',
-            content: data.observation.stdout
-          });
-        }
+    } else if (data.operation === 'observe') {
+      if(data.content){
+        console.log('[Terminal处理] 添加输出:', data.content.substring(0, 100) + (data.content.length > 100 ? '...' : ''));
+        updateAppContent('terminal', {
+          type: 'stdout',
+          content: data.content
+        });
+      }
+      if(data.error){
+        console.log('[Terminal处理] 添加错误:', data.error.substring(0, 100) + (data.error.length > 100 ? '...' : ''));
+        updateAppContent('terminal', {
+          type: 'stderr',
+          content: data.error
+        });
       }
     } else {
       console.warn('[Terminal处理] 未识别的数据格式:', data);
@@ -305,13 +285,15 @@ export default function Home() {
   const processBrowserData = (data: any) => {
     console.log('[Browser处理] 接收到数据:', data);
     
-    if (data.site) {
-      console.log('[Browser处理] 添加网站:', data.site);
-      updateAppContent('browser', {
-        type: 'site',
-        content: data.site
-      });
-    } else {
+    if(data.operation === 'open'){
+      if (data.content) {
+        console.log('[Browser处理] 添加网站:', data.content);
+        updateAppContent('browser', {
+          type: 'site',
+          content: data.content
+        });
+      } 
+    }else {
       console.warn('[Browser处理] 未识别的数据格式:', data);
     }
   };
@@ -325,7 +307,7 @@ export default function Home() {
         console.log(`[File处理] 添加文件: ${data.file_path}`);
         
         updateAppContent('file', {
-          type: 'file-name',
+          type:  `file-name-${data.content ? 'write' : 'read'}`,
           content: data.file_path
         });
       }
@@ -367,26 +349,17 @@ export default function Home() {
   const processOutputData = (data: any) => {
     console.log('[Output处理] 接收到数据:', data);
     
-    if (data.output) {
-      const type = data.output.toLowerCase().includes('error') ? 'error' : 'info';
-      console.log(`[Output处理] 添加${type === 'error' ? '错误' : '信息'}: ${data.output} `);
-      
-      updateAppContent('output', {
-        type,
-        content: data.output,
-        timestamp: Date.now()
-      });
-    } else if(data.finish_reason){
-      const type = 'info';
-      console.log('[Output处理] 添加结束原因:', data.finish_reason);
-
-      updateAppContent('output', {
-        type,
-        content: data.finish_reason,
-        timestamp: Date.now()
-      });
-
-      setIsWorking(false);
+    if(data.operation === 'observe'){
+      if (data.content) {
+        const type = data.content.toLowerCase().includes('error') ? 'error' : 'info';
+        console.log(`[Output处理] 添加${type === 'error' ? '错误' : '信息'}: ${data.content} `);
+        
+        updateAppContent('output', {
+          type,
+          content: data.content,
+          timestamp: Date.now()
+        });
+      }
     }
     else {
       console.warn('[Output处理] 未识别的数据格式:', data);
