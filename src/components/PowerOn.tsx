@@ -31,8 +31,10 @@ const GlassPanel = styled.div`
 `;
 
 const TaskText = styled.p`
+  font-family: 'Comic Sans MS', cursive, sans-serif;
   font-size: 56px;
-  color: #333;
+  font-weight: 600;
+  color: #666;
   margin-top: 20px;
   margin-bottom: 60px;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
@@ -40,10 +42,11 @@ const TaskText = styled.p`
 `;
 
 const TaskTextSub = styled.p`
-  font-size: 16px;
-  color: #333;
+  font-size: 14px;
+  color: #666;
   margin: 0;
   white-space: nowrap;
+  font-weight: 600;
 `;
 
 const InputContainer = styled.div`
@@ -52,20 +55,21 @@ const InputContainer = styled.div`
   width: 100%;
   padding-bottom: 10px;
   margin-bottom: 20px;
-  border-bottom: 2px solid #333;
+  border-bottom: 2px solid #666;
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
 `;
 
 const RepoInput = styled.input`
   border-radius: 0px;
-  font-size: 16px;
+  font-size: 14px;
   border: none;
-  color: #666;
+  color: #000;
   outline: none;
   padding-left: 10px;
   padding-right: 10px;
   flex: 1;
   min-width: 0;
+  font-weight: 600;
 
   &:focus {
     border: none;
@@ -76,7 +80,7 @@ const PowerButton = styled.button`
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  border: 4px solid #333;
+  border: 4px solid #666;
   background: white;
   color: #666;
   font-size: 48px;
@@ -100,6 +104,7 @@ const PowerButton = styled.button`
   
   &:hover {
     color: #333;
+    border: 6px solid #333;
     font-weight: 600;
     box-shadow: 0 6px 12px rgba(99, 102, 241, 0.3);
   }
