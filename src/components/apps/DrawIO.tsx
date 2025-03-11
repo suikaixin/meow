@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import styled from 'styled-components';
+import { FiEdit, FiEye, FiDownload } from 'react-icons/fi';
 
 interface DrawIOItem {
   type: 'drawio-file';
@@ -21,7 +22,7 @@ const Container = styled.div`
 
 const GalleryGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 15px;
   padding: 10px;
 `;
@@ -32,7 +33,6 @@ const DiagramCard = styled.div`
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   transition: transform 0.2s, box-shadow 0.2s;
-  cursor: pointer;
   
   &:hover {
     transform: translateY(-5px);
@@ -42,10 +42,11 @@ const DiagramCard = styled.div`
 
 const DiagramPreview = styled.div`
   width: 100%;
-  height: 150px;
+  height: 200px;
   position: relative;
   background: #f8f8f8;
   overflow: hidden;
+  cursor: pointer;
   
   iframe {
     width: 100%;
@@ -54,28 +55,47 @@ const DiagramPreview = styled.div`
   }
 `;
 
-const DiagramPlaceholder = styled.div`
-  width: 100%;
-  height: 150px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f8f8f8;
-  color: #666;
-  font-size: 12px;
-`;
-
 const DiagramInfo = styled.div`
   padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const DiagramTitle = styled.div`
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: #333;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  word-wrap: break-all;
+  overflow-wrap: break-all;
+  line-height: 1.4;
+  text-align: center;
+  margin-bottom: 8px;
+`;
+
+const IconContainer = styled.div`
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+`;
+
+const IconButton = styled.button`
+  background: none;
+  border: none;
+  color: #555;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+
+  &:hover {
+    color: #000;
+    background: #f0f0f0;
+  }
 `;
 
 const EmptyState = styled.div`
@@ -115,15 +135,59 @@ const DrawIO: React.FC<DrawIOProps> = ({ content }) => {
     }
   };
 
-  const openInDrawIO = (url: string) => {
+  const openInDrawIO = (url: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
     // 使用 app.diagrams.net 的编辑模式打开图表
     const editUrl = `https://app.diagrams.net/?url=${encodeURIComponent(url)}&title=${getFileNameFromUrl(url)}`;
     window.open(editUrl, '_blank');
   };
 
   const getPreviewUrl = (url: string) => {
-    // 创建一个只读预览链接（使用 chrome=0 参数禁用工具栏）
-    return `https://viewer.diagrams.net/?highlight=0000ff&edit=_blank&layers=1&nav=1&toolbar=0&url=${encodeURIComponent(url)}`;
+    // 创建一个只读预览链接，添加更多参数以获得更大的预览
+    // lightbox=1：使用灯箱模式（更大的缩放，无页面可见）
+    // border=20：减小灯箱模式的边框宽度，默认为60
+    // scale=1.5：增加缩放比例使图像更大
+    // chrome=0：使用无浏览器的只读查看器
+    // nav=1：启用折叠功能
+    return `https://viewer.diagrams.net/?chrome=0&lightbox=1&border=20&scale=1.5&nav=1&toolbar=0&url=${encodeURIComponent(url)}&title=${getFileNameFromUrl(url)}`;
+  };
+  
+  const openViewerOnly = (url: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const viewerUrl = `https://viewer.diagrams.net/?chrome=0&nav=1&url=${encodeURIComponent(url)}&title=${getFileNameFromUrl(url)}`;
+    window.open(viewerUrl, '_blank');
+  };
+  
+  const downloadDiagram = async (url: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      // 显示加载状态或提示信息（可选）
+      
+      // 获取文件内容
+      const response = await fetch(url);
+      const blob = await response.blob();
+      
+      // 创建一个临时的URL对象和下载链接
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = getFileNameFromUrl(url);
+      
+      // 添加链接到DOM并触发点击
+      document.body.appendChild(link);
+      link.click();
+      
+      // 清理临时对象
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+      }, 100);
+    } catch (error) {
+      console.error('下载图表时出错:', error);
+      // 可以在这里添加错误提示
+    }
   };
   
   return (
@@ -131,11 +195,8 @@ const DrawIO: React.FC<DrawIOProps> = ({ content }) => {
       {diagrams.length > 0 ? (
         <GalleryGrid>
           {diagrams.map((diagram, index) => (
-            <DiagramCard 
-              key={index} 
-              onClick={() => openInDrawIO(diagram.content)}
-            >
-              <DiagramPreview>
+            <DiagramCard key={index}>
+              <DiagramPreview onClick={() => openInDrawIO(diagram.content)}>
                 <iframe 
                   src={getPreviewUrl(diagram.content)} 
                   title={`图表预览 ${index + 1}`}
@@ -147,6 +208,26 @@ const DrawIO: React.FC<DrawIOProps> = ({ content }) => {
                 <DiagramTitle>
                   {getFileNameFromUrl(diagram.content)}
                 </DiagramTitle>
+                <IconContainer>
+                  <IconButton 
+                    title="编辑图表" 
+                    onClick={(e) => openInDrawIO(diagram.content, e)}
+                  >
+                    <FiEdit size={16} />
+                  </IconButton>
+                  <IconButton 
+                    title="查看图表" 
+                    onClick={(e) => openViewerOnly(diagram.content, e)}
+                  >
+                    <FiEye size={16} />
+                  </IconButton>
+                  <IconButton 
+                    title="下载图表" 
+                    onClick={(e) => downloadDiagram(diagram.content, e)}
+                  >
+                    <FiDownload size={16} />
+                  </IconButton>
+                </IconContainer>
               </DiagramInfo>
             </DiagramCard>
           ))}

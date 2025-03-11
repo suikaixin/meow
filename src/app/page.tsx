@@ -328,7 +328,14 @@ export default function Home() {
         type:  'file-info',
         content: data.content
       });
-    }else {
+    }else if (data.operation === 'upload') {
+      console.log(`[File处理][转交Output处理] 添加上传文件: ${data.file_path}`);
+
+      updateAppContent('output', {
+        type:  'info',
+        content: `Upload file: ${data.file_path}`
+      });
+    } else {
       console.warn('[File处理] 未识别的数据格式:', data);
     }
   };
