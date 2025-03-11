@@ -116,7 +116,7 @@ const PowerButton = styled.button`
 `;
 
 const PowerOn: React.FC<PowerOnProps> = ({ onPowerOn }) => {
-  const [repoUrl, setRepoUrl] = useState<string>('https://github.com/octocat/Hello-World');
+  const [repoUrl, setRepoUrl] = useState<string>('');
   
   return (
     <PowerOnContainer>
@@ -130,7 +130,7 @@ const PowerOn: React.FC<PowerOnProps> = ({ onPowerOn }) => {
             type="text"
             value={repoUrl}
             onChange={(e) => setRepoUrl(e.target.value)}
-            placeholder="Enter the GitHub repo URL"
+            placeholder="Enter the GitHub Repo URL"
           />
           <TaskTextSub>and draw some figures</TaskTextSub>
         </InputContainer>

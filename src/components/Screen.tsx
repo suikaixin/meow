@@ -35,9 +35,9 @@ const MeowAvatar = styled.div<{ $isWorking: boolean }>`
   position: absolute;
   bottom: 20px;
   right: 20px;
-  width: 240px;
-  height: 240px;
-  z-index: 999;
+  width: 200px;
+  height: 200px;
+  z-index: 10;
   opacity: ${({ $isWorking }) => $isWorking ? 1 : 1};
   transition: opacity 0.3s ease;
   background: white;
@@ -91,8 +91,8 @@ const Screen: React.FC<ScreenProps> = ({
         <Image 
           src={isWorking ? '/images/cat-key.gif' : '/images/cat-tea.gif'} 
           alt="Meow Avatar" 
-          width={200} 
-          height={200}
+          width={160} 
+          height={160}
         />
       </MeowAvatar>
       {power === 'on' && (
