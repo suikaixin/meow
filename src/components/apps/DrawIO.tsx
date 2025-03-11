@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import styled from 'styled-components';
-import Image from 'next/image';
 
 interface DrawIOItem {
-  type: 'fileurl';
+  type: 'drawio-file';
   content: string;
 }
 
@@ -22,8 +21,8 @@ const Container = styled.div`
 
 const GalleryGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
   padding: 10px;
 `;
 
@@ -33,6 +32,7 @@ const DiagramCard = styled.div`
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
   
   &:hover {
     transform: translateY(-5px);
@@ -40,23 +40,37 @@ const DiagramCard = styled.div`
   }
 `;
 
-const DiagramImage = styled.div`
+const DiagramPreview = styled.div`
   width: 100%;
-  height: 180px;
+  height: 150px;
   position: relative;
   background: #f8f8f8;
+  overflow: hidden;
   
-  img {
-    object-fit: contain;
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
   }
 `;
 
+const DiagramPlaceholder = styled.div`
+  width: 100%;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f8f8;
+  color: #666;
+  font-size: 12px;
+`;
+
 const DiagramInfo = styled.div`
-  padding: 12px;
+  padding: 10px;
 `;
 
 const DiagramTitle = styled.div`
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: #333;
   white-space: nowrap;
@@ -73,10 +87,23 @@ const EmptyState = styled.div`
   color: #888;
   text-align: center;
   padding: 20px;
+  line-height: 2;
+`;
+
+const EmptyStateBold = styled.div`
+  font-size: 16px;
+  font-weight: bold;
 `;
 
 const DrawIO: React.FC<DrawIOProps> = ({ content }) => {
-  const diagrams = content?.filter(item => item.type === 'fileurl') || [];
+  const containerRef = useRef<HTMLDivElement>(null);
+  const diagrams = content?.filter(item => item.type === 'drawio-file') || [];
+  
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    }
+  }, [content]);
   
   const getFileNameFromUrl = (url: string) => {
     try {
@@ -87,21 +114,35 @@ const DrawIO: React.FC<DrawIOProps> = ({ content }) => {
       return '图表';
     }
   };
+
+  const openInDrawIO = (url: string) => {
+    // 使用 app.diagrams.net 的编辑模式打开图表
+    const editUrl = `https://app.diagrams.net/?url=${encodeURIComponent(url)}&title=${getFileNameFromUrl(url)}`;
+    window.open(editUrl, '_blank');
+  };
+
+  const getPreviewUrl = (url: string) => {
+    // 创建一个只读预览链接（使用 chrome=0 参数禁用工具栏）
+    return `https://viewer.diagrams.net/?highlight=0000ff&edit=_blank&layers=1&nav=1&toolbar=0&url=${encodeURIComponent(url)}`;
+  };
   
   return (
-    <Container>
+    <Container ref={containerRef}>
       {diagrams.length > 0 ? (
         <GalleryGrid>
           {diagrams.map((diagram, index) => (
-            <DiagramCard key={index}>
-              <DiagramImage>
-                <Image 
-                  src={diagram.content} 
-                  alt={`图表 ${index + 1}`}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            <DiagramCard 
+              key={index} 
+              onClick={() => openInDrawIO(diagram.content)}
+            >
+              <DiagramPreview>
+                <iframe 
+                  src={getPreviewUrl(diagram.content)} 
+                  title={`图表预览 ${index + 1}`}
+                  loading="lazy"
+                  sandbox="allow-scripts allow-same-origin"
                 />
-              </DiagramImage>
+              </DiagramPreview>
               <DiagramInfo>
                 <DiagramTitle>
                   {getFileNameFromUrl(diagram.content)}
@@ -112,8 +153,8 @@ const DrawIO: React.FC<DrawIOProps> = ({ content }) => {
         </GalleryGrid>
       ) : (
         <EmptyState>
-          <h3>没有可用的图表</h3>
-          <p>当生成图表时，它们将显示在这里</p>
+          <EmptyStateBold>没有可用的图表</EmptyStateBold>
+          当生成图表时，它们将显示在这里
         </EmptyState>
       )}
     </Container>

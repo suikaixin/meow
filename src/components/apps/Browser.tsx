@@ -219,12 +219,10 @@ const Browser: React.FC<BrowserProps> = ({ content }) => {
       
       setTabs(newTabs);
       
-      // 如果没有活动标签页或活动标签页不在新的标签列表中，选择第一个标签
-      if (!activeTabId || !newTabs.find(tab => tab.id === activeTabId)) {
-        setActiveTabId(newTabs[0].id);
-      }
+      // 总是切换到最新的标签页
+      setActiveTabId(newTabs[newTabs.length - 1].id);
     }
-  }, [content, activeTabId]);
+  }, [content]);
   
   const activeTab = tabs.find(tab => tab.id === activeTabId);
   

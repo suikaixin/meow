@@ -106,42 +106,52 @@ const NoSelection = styled.div`
 const FileExplorer: React.FC<FileExplorerProps> = ({ content }) => {
   const [files, setFiles] = useState<FileItem[]>([]);
   const [infoContent, setInfoContent] = useState<string[]>([]);
-  const previewAreaRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
-    if (content) {
-      // 处理文件，移除去重逻辑，直接添加所有文件
-      const newFiles = content
-        .filter(item => item.type.startsWith('file-name'));
-      if (newFiles.length > 0) {
-        setFiles(prevFiles => [...prevFiles, ...newFiles]);
-      }
+    if (content && content.length > 0) {
+      // 处理文件列表 (file-name 类型)
+      const newFiles = content.filter(item => item.type.startsWith('file-name'));
+      setFiles(newFiles);
       
-      // 处理预览区内容（file-info 类型）
+      // 处理预览区内容 (file-info 类型)
       const newInfos = content
         .filter(item => item.type === 'file-info')
         .map(item => item.content);
       
-      if (newInfos.length > 0) {
-        setInfoContent(prev => [...prev, ...newInfos]);
-      }
+      setInfoContent(newInfos);
     }
   }, [content]);
 
   // 添加内容后自动滚动到底部
   useEffect(() => {
-    if (previewAreaRef.current && infoContent.length > 0) {
-      previewAreaRef.current.scrollTop = previewAreaRef.current.scrollHeight;
+    if (containerRef.current && infoContent.length > 0) {
+      // 获取预览区域元素并滚动到底部
+      const previewArea = containerRef.current.querySelector('[data-scroll="preview-area"]');
+      if (previewArea) {
+        previewArea.scrollTop = previewArea.scrollHeight;
+      }
     }
   }, [infoContent]);
+
+  // 文件列表更新后自动滚动到底部
+  useEffect(() => {
+    if (containerRef.current && files.length > 0) {
+      // 获取侧边栏元素并滚动到底部
+      const sidebar = containerRef.current.querySelector('[data-scroll="sidebar"]');
+      if (sidebar) {
+        sidebar.scrollTop = sidebar.scrollHeight;
+      }
+    }
+  }, [files]);
   
   const getFileExtension = (filename: string) => {
     return filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);
   };
   
   return (
-    <Container>
-      <Sidebar>
+    <Container ref={containerRef}>
+      <Sidebar data-scroll="sidebar">
         <FileList>
           {files.map((file, index) => (
             <FileListItem 
@@ -163,7 +173,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ content }) => {
         </FileList>
       </Sidebar>
       
-      <PreviewArea ref={previewAreaRef}>
+      <PreviewArea data-scroll="preview-area">
         {infoContent.length > 0 ? (
           infoContent.map((info, index) => (
             <PreviewContent key={index}>

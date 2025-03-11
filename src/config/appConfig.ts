@@ -8,7 +8,7 @@ import {
 } from 'react-icons/fa';
 import { IconType } from 'react-icons';
 
-export type ContentType = 'command' | 'stderr' | 'stdout' | 'site' | 'file-name-write' | 'file-name-read' | 'file-info' | 'drawio-url' | 'info' | 'error';
+export type ContentType = 'command' | 'stderr' | 'stdout' | 'site' | 'file-name-write' | 'file-name-read' | 'file-info' | 'drawio-file' | 'info' | 'error';
 
 export interface AppConfig {
   name: string;
@@ -35,7 +35,7 @@ export const appConfigs: Record<string, AppConfig> = {
   drawio: {
     name: 'DrawIO',
     icon:  FaProjectDiagram ,
-    contentTypes: ['drawio-url']
+    contentTypes: ['drawio-file']
   },
   output: {
     name: 'Diary',

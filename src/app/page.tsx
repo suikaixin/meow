@@ -302,30 +302,33 @@ export default function Home() {
   const processFileData = (data: any) => {
     console.log('[File处理] 接收到数据:', data);
     
-    if (data.file_path || data.content) {
-      if (data.file_path) {
-        console.log(`[File处理] 添加文件: ${data.file_path}`);
+    if (data.operation === 'write') {
+        console.log(`[File处理] 添加写文件: ${data.file_path}`);
         
         updateAppContent('file', {
-          type:  `file-name-${data.content ? 'write' : 'read'}`,
+          type:  'file-name-write',
           content: data.file_path
         });
-      }
-      if (data.content) {
-        console.log(`[File处理] 添加文件内容: 长度 ${data.content.length} 字符`);
-  
+
         updateAppContent('file', {
-          type: 'file-info',
+          type:  'file-info',
           content: data.content
         });
-      }
-    } else if (data.observation) {
-      console.log('[File处理] 添加提示内容:', data.observation);
+    } else if (data.operation === 'read') {
+      console.log(`[File处理] 添加读文件: ${data.file_path}`);
+
       updateAppContent('file', {
-        type: 'file-info',
-        content: data.observation
+        type:  'file-name-read',
+        content: data.file_path
       });
-    } else {
+    }else if (data.operation === 'observe') {
+      console.log(`[File处理] 添加读文件: ${data.file_path}`);
+
+      updateAppContent('file', {
+        type:  'file-info',
+        content: data.content
+      });
+    }else {
       console.warn('[File处理] 未识别的数据格式:', data);
     }
   };
@@ -334,11 +337,11 @@ export default function Home() {
   const processDrawIOData = (data: any) => {
     console.log('[DrawIO处理] 接收到数据:', data);
     
-    if (data.url) {
-      console.log('[DrawIO处理] 添加URL:', data.url);
+    if(data.operation === 'observe'){
+      console.log('[DrawIO处理] 添加URL:', data.file_path);
       updateAppContent('drawio', {
-        type: 'fileurl',
-        content: data.url
+        type: 'drawio-file',
+        content: data.file_path
       });
     } else {
       console.warn('[DrawIO处理] 未识别的数据格式:', data);
