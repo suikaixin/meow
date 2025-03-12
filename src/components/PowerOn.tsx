@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { FaPowerOff } from 'react-icons/fa';
 import styled from 'styled-components';
 
 interface PowerOnProps {
@@ -10,43 +11,36 @@ const PowerOnContainer = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: transparent;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid #f1f1f1;
+  padding: 40px;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   z-index: 100;
   text-align: left;
-  width: 700px;
+  width: 600px;
 `;
 
-const GlassPanel = styled.div`
-  padding: 40px;
-  background: white;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  text-align: center;
+const Title = styled.p`
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  font-size: 24px;
   width: 100%;
+  text-align: left;
+  color: #000;
+  margin-top: 10px;
+  margin-bottom: 40px;
 `;
 
 const TaskText = styled.p`
-  font-family: 'Comic Sans MS', cursive, sans-serif;
-  font-size: 56px;
-  font-weight: 600;
-  color: #666;
-  margin-top: 20px;
-  margin-bottom: 60px;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  line-height: 1.5;
-`;
-
-const TaskTextSub = styled.p`
   font-size: 14px;
-  color: #666;
+  color: #000;
   margin: 0;
   white-space: nowrap;
-  font-weight: 600;
+  border: none;
+
 `;
 
 const InputContainer = styled.div`
@@ -54,13 +48,12 @@ const InputContainer = styled.div`
   align-items: center;
   width: 100%;
   padding-bottom: 10px;
-  margin-bottom: 20px;
-  border-bottom: 2px solid #666;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+  margin-bottom: 30px;
+  border: none;
+  border-bottom: 2px solid #000;
 `;
 
 const RepoInput = styled.input`
-  border-radius: 0px;
   font-size: 14px;
   border: none;
   color: #000;
@@ -69,49 +62,22 @@ const RepoInput = styled.input`
   padding-right: 10px;
   flex: 1;
   min-width: 0;
-  font-weight: 600;
+  background: transparent;
 
   &:focus {
     border: none;
   }
 `;
 
-const PowerButton = styled.button`
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  border: 4px solid #666;
-  background: white;
-  color: #666;
-  font-size: 48px;
-  font-weight: 400;
+const PowerOnButton = styled.div`
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 0px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  position: relative;
-  margin: 40px auto 20px auto;
-
-  &::after {
-    content: "⏻";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
+  color: #000;
   
   &:hover {
-    color: #333;
-    border: 6px solid #333;
-    font-weight: 600;
-    box-shadow: 0 6px 12px rgba(99, 102, 241, 0.3);
-  }
-  
-  &:active {
-    transform: scale(0.95);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: green;
   }
 `;
 
@@ -120,22 +86,22 @@ const PowerOn: React.FC<PowerOnProps> = ({ onPowerOn }) => {
   
   return (
     <PowerOnContainer>
-      <GlassPanel>
-        <TaskText>
+        <Title>
           Tell Meow Your Task
-        </TaskText>
+        </Title>
         <InputContainer>
-          <TaskTextSub>Clone the repo</TaskTextSub>
+          <TaskText>Clone the repo</TaskText>
           <RepoInput
             type="text"
             value={repoUrl}
             onChange={(e) => setRepoUrl(e.target.value)}
             placeholder="Enter the GitHub Repo URL"
           />
-          <TaskTextSub>and draw some figures</TaskTextSub>
+          <TaskText>and draw some figures !</TaskText>
         </InputContainer>
-        <PowerButton onClick={() => onPowerOn(repoUrl)} aria-label="Power On" />
-      </GlassPanel>
+        <PowerOnButton>
+          <FaPowerOff onClick={()=> {onPowerOn(repoUrl)}} />
+        </PowerOnButton>
     </PowerOnContainer>
   );
 };
