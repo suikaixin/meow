@@ -37,6 +37,9 @@ const TimerIcon = styled.div<{ $isWorking: boolean }>`
 
 const PowerOffButton = styled.div`
   cursor: pointer;
+  padding: 0px;
+  display: flex;
+  align-items: center;
   
   &:hover {
     color: #ff6b6b;

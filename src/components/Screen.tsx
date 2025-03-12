@@ -2,9 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import Dock from '@/components/Dock';
 import AppWindow from '@/components/AppWindow';
-import Image from 'next/image';
 import { appNames } from '@/config/appConfig';
 import TaskTimer from '@/components/TaskTimer';
+import Meow from './Meow';
 
 interface ScreenProps {
   power: 'on' | 'off';
@@ -32,22 +32,6 @@ const ScreenContainer = styled.div<{ $power: 'on' | 'off' }>`
   transition: all 0.5s ease;
 `;
 
-const MeowAvatar = styled.div<{ $isWorking: boolean }>`
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  width: 200px;
-  height: 200px;
-  z-index: 10;
-  opacity: ${({ $isWorking }) => $isWorking ? 1 : 1};
-  transition: opacity 0.3s ease;
-  background: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-`;
 
 const ErrorMessage = styled.div`
   position: absolute;
@@ -94,14 +78,7 @@ const Screen: React.FC<ScreenProps> = ({
           <TaskTimer isWorking={isWorking} />
          </>
       )}
-      <MeowAvatar $isWorking={isWorking}>
-        <Image 
-          src={isWorking ? '/images/cat-key.gif' : '/images/cat-tea.gif'} 
-          alt="Meow Avatar" 
-          width={160} 
-          height={160}
-        />
-      </MeowAvatar>
+      <Meow isWorking={isWorking} />
     </ScreenContainer>
   );
 };
