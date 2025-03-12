@@ -1,5 +1,3 @@
-'use client';
-
 import { styled } from 'styled-components';
 
 const PageWrapper = styled.div`
@@ -113,7 +111,7 @@ const PowerButton = styled.button`
   }
 `;
 
-export default function WelcomePage() {
+const Welcome: React.FC<{}> = ({}) =>  {
   return (
     <PageWrapper>
       <ContentContainer>
@@ -142,3 +140,5 @@ export default function WelcomePage() {
     </PageWrapper>
   );
 }
+
+export default Welcome;

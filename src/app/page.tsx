@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import Screen from '@/components/Screen';
 import PowerOn from '@/components/PowerOn';
-import BootingScreen from '@/components/BootingScreen';
+import BootingScreen from '@/components/Booting';
 import { appNames } from '@/config/appConfig';
 
 const Container = styled.div`
@@ -94,7 +94,7 @@ export default function Home() {
     // 更新browser内容为占位页面
     updateAppContent('browser', {
       type: 'site',
-      content: 'http://localhost:3000/welcome'
+      content: 'welcome'
     });
     
     // 添加初始信息到output

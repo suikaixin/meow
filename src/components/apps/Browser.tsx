@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FaGithub, FaExternalLinkAlt } from 'react-icons/fa';
+import Welcome from '@/components/Welcome';
 
 interface BrowserTab {
   id: string;
@@ -169,6 +170,10 @@ const isNonEmbeddableSite = (url: string): boolean => {
   }
 };
 
+const isWelcome = (url: string) => {
+  return url === 'welcome';
+};
+
 // 根据URL返回适当的网站图标
 const getSiteIcon = (url: string) => {
   if (url.includes('github.com')) {
@@ -251,7 +256,9 @@ const Browser: React.FC<BrowserProps> = ({ content }) => {
       
       <ContentFrame>
         {activeTab ? (
-          isNonEmbeddableSite(activeTab.url) ? (
+          isWelcome(activeTab.url) ? (
+            <Welcome />
+          ) : isNonEmbeddableSite(activeTab.url) ? (
             renderNonEmbeddableSiteMessage(activeTab.url)
           ) : (
             <IFrame 
