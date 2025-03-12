@@ -10,13 +10,16 @@ const TimerContainer = styled.div`
   position: absolute;
   top: 20px;
   right: 20px;
-  background-color: rgba(0, 0, 0, 0.6);
-  color: white;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid #f1f1f1;
+  color: #000;
+  width: 150px;
   padding: 8px 12px;
   border-radius: 8px;
   font-size: 12px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   z-index: 10;
 `;
