@@ -125,12 +125,17 @@ export default function Home() {
         // 明确指定不使用HTTP/2
         cache: 'no-store',
         keepalive: true,
-        // 设置较长的超时时间 (30秒)
-        signal: AbortSignal.timeout(3000000)
+        // 设置较长的超时时间 1 小时
+        signal: AbortSignal.timeout(3600000)
       })
       .then(response => {
         if (!response.ok) {
           console.error(`[SSE] 请求失败，状态码: ${response.status}`);
+          updateAppContent('output', {
+            type: 'error',
+            content: `SSE request error ${response.status}`,
+            timestamp: Date.now()
+          });
           setIsWorking(false);
           throw new Error(`HTTP 错误 ${response.status}`);
         }
@@ -145,6 +150,11 @@ export default function Home() {
           reader.read().then(({ done, value }) => {
             if (done) {
               console.log('[SSE] 数据流读取完成');
+              updateAppContent('output', {
+                type: 'info',
+                content: `SSE read stream done`,
+                timestamp: Date.now()
+              });
               setIsWorking(false);
               return;
             }
