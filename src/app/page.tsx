@@ -117,9 +117,9 @@ export default function Home() {
           'Content-Type': 'application/json',
           'Accept': 'text/event-stream',
           'Connection': 'keep-alive',
-          'Cache-Control': 'no-cache',
+          'Cache-Control': 'no-cache'
           // 强制使用HTTP/1.1协议
-          'X-HTTP-Version': 'HTTP/1.1'
+          // 'X-HTTP-Version': 'HTTP/1.1'
         },
         body: JSON.stringify({ site: repoUrl }),
         // 明确指定不使用HTTP/2
