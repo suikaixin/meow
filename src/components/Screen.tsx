@@ -4,6 +4,7 @@ import Dock from '@/components/Dock';
 import AppWindow from '@/components/AppWindow';
 import Image from 'next/image';
 import { appNames } from '@/config/appConfig';
+import TaskTimer from '@/components/TaskTimer';
 
 interface ScreenProps {
   power: 'on' | 'off';
@@ -85,8 +86,15 @@ const Screen: React.FC<ScreenProps> = ({
               onClose={() => onCloseApp(appName)}
             />
           ))}
+          <Dock 
+            apps={appNames}
+            activeApps={safeActiveApps}
+            onToggleApp={onToggleApp}
+          />
+          {/* <PowerOff /> */}
          </>
       )}
+      <TaskTimer isWorking={isWorking} />
       <MeowAvatar $isWorking={isWorking}>
         <Image 
           src={isWorking ? '/images/cat-key.gif' : '/images/cat-tea.gif'} 
@@ -95,15 +103,6 @@ const Screen: React.FC<ScreenProps> = ({
           height={160}
         />
       </MeowAvatar>
-      {power === 'on' && (
-        <>
-          <Dock 
-            apps={appNames}
-            activeApps={safeActiveApps}
-            onToggleApp={onToggleApp}
-          />
-        </>
-      )}
     </ScreenContainer>
   );
 };
