@@ -3,7 +3,7 @@ import { styled } from 'styled-components';
 
 const MeowAvatar = styled.div<{ $isWorking: boolean }>`
   position: absolute;
-  top: 65px;
+  bottom: 20px;
   right: 20px;
   width: 150px;
   height: 150px;
