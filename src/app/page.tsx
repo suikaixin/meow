@@ -370,7 +370,9 @@ export default function Home() {
     
     if(data.operation === 'observe'){
       if (data.content) {
-        const type = data.content.toLowerCase().includes('error') ? 'error' : 'info';
+        const errorKeywords = ['stop', 'error', 'exception'];
+        const contentLower = data.content.toLowerCase();
+        const type = errorKeywords.some(keyword => contentLower.includes(keyword)) ? 'error' : 'info';
         console.log(`[Output处理] 添加${type === 'error' ? '错误' : '信息'}: ${data.content} `);
         
         updateAppContent('output', {
