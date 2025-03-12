@@ -100,7 +100,7 @@ export default function Home() {
     // 添加初始信息到output
     updateAppContent('output', {
       type: 'info',
-      content: `Start to execute Task`,
+      content: `Start to execute task`,
       timestamp: Date.now()
     });
     
