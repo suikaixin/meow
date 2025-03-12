@@ -91,10 +91,9 @@ const Screen: React.FC<ScreenProps> = ({
             activeApps={safeActiveApps}
             onToggleApp={onToggleApp}
           />
-          {/* <PowerOff /> */}
+          <TaskTimer isWorking={isWorking} />
          </>
       )}
-      <TaskTimer isWorking={isWorking} />
       <MeowAvatar $isWorking={isWorking}>
         <Image 
           src={isWorking ? '/images/cat-key.gif' : '/images/cat-tea.gif'} 

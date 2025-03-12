@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { FaPowerOff } from 'react-icons/fa';
 import styled from 'styled-components';
 
 interface TaskTimerProps {
@@ -20,21 +21,25 @@ const TimerContainer = styled.div`
   z-index: 10;
 `;
 
-interface TimerIconProps {
-  color: string;
-}
-
-const TimerIcon = styled.div<TimerIconProps>`
+const TimerIcon = styled.div<{ $isWorking: boolean }>`
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: ${props => props.color};
+  background-color: ${({ $isWorking }) => $isWorking ? '#00ff00' : '#ff0000'};
   animation: none;
 
   @keyframes blinking {
     0% { opacity: 0.2; }
     50% { opacity: 1; }
     100% { opacity: 0.2; }
+  }
+`;
+
+const PowerOffButton = styled.div`
+  cursor: pointer;
+  
+  &:hover {
+    color: #ff6b6b;
   }
 `;
 
@@ -70,8 +75,11 @@ const TaskTimer: React.FC<TaskTimerProps> = ({ isWorking }) => {
   
   return (
     <TimerContainer>
-      <TimerIcon color={isWorking ? '#00ff00' : '#ff0000'} />
-        Working {formatTime(seconds)}
+      <TimerIcon $isWorking={isWorking} />
+        {formatTime(seconds)}
+      <PowerOffButton>
+        <FaPowerOff onClick={()=> {window.location.href = '/'}} />
+      </PowerOffButton>
     </TimerContainer>
   );
 };
