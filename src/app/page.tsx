@@ -47,9 +47,9 @@ export default function Home() {
   const [appWindows, setAppWindows] = useState<Record<string, any>>({});
   
   // 处理开机
-  const handlePowerOn = async (repoUrl: string) => {
+  const handlePowerOn = async (task: string, text: string) => {
     setIsBooting(true);
-    fetchSSEData(repoUrl);
+    fetchSSEData(task, text);
   };
   
   // 处理启动完成
@@ -79,8 +79,8 @@ export default function Home() {
   };
   
   // 调用SSE API
-  const fetchSSEData = (repoUrl: string) => {
-    console.log(`[SSE] 开始处理仓库: ${repoUrl}`);
+  const fetchSSEData = (task: string, text: string) => {
+    console.log(`[SSE] 开始处理任务: ${task} ${text}`);
     
     // 初始化应用内容
     appNames.forEach(appName => {
@@ -121,7 +121,8 @@ export default function Home() {
           // 强制使用HTTP/1.1协议
           // 'X-HTTP-Version': 'HTTP/1.1'
         },
-        body: JSON.stringify({ site: repoUrl }),
+        // body: JSON.stringify({ task: task, text: text }),
+        body: JSON.stringify({ site: text }),
         // 明确指定不使用HTTP/2
         cache: 'no-store',
         keepalive: true,

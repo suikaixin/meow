@@ -3,7 +3,7 @@ import { FaPowerOff } from 'react-icons/fa';
 import styled from 'styled-components';
 
 interface PowerOnProps {
-  onPowerOn: (repoUrl: string) => void;
+  onPowerOn: (task: string, text: string) => void;
 }
 
 const PowerOnContainer = styled.div`
@@ -34,34 +34,44 @@ const Title = styled.p`
   margin-bottom: 40px;
 `;
 
-const TaskText = styled.p`
+const TaskList = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+`;
+
+const TaskItem = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
+  border: none;
+`;
+
+
+const TaskText = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+`;
+
+const TaskSpan = styled.p`
   font-size: 14px;
   color: #000;
   margin: 0;
   white-space: nowrap;
   border: none;
-
 `;
 
-const InputContainer = styled.div`
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding-bottom: 10px;
-  margin-bottom: 30px;
-  border: none;
-  border-bottom: 2px solid #000;
-`;
-
-const RepoInput = styled.input`
+const TaskInput = styled.input`
   font-size: 14px;
   border: none;
   color: #000;
   outline: none;
   padding-left: 10px;
   padding-right: 10px;
-  flex: 1;
-  min-width: 0;
+  width:150px;
   background: transparent;
 
   &:focus {
@@ -75,7 +85,7 @@ const PowerOnButton = styled.div`
   display: flex;
   align-items: center;
   color: #000;
-  
+  margin-right: 10px;
   &:hover {
     color: green;
   }
@@ -83,25 +93,45 @@ const PowerOnButton = styled.div`
 
 const PowerOn: React.FC<PowerOnProps> = ({ onPowerOn }) => {
   const [repoUrl, setRepoUrl] = useState<string>('');
+  const [topicText, setTopicText] = useState<string>('');
   
   return (
     <PowerOnContainer>
         <Title>
           Tell Meow Your Task
         </Title>
-        <InputContainer>
-          <TaskText>Clone the repo</TaskText>
-          <RepoInput
-            type="text"
-            value={repoUrl}
-            onChange={(e) => setRepoUrl(e.target.value)}
-            placeholder="Enter the GitHub Repo URL"
-          />
-          <TaskText>and draw some figures !</TaskText>
-        </InputContainer>
-        <PowerOnButton>
-          <FaPowerOff onClick={()=> {onPowerOn(repoUrl)}} />
-        </PowerOnButton>
+        <TaskList>
+          <TaskItem>
+            <PowerOnButton>
+              <FaPowerOff onClick={()=> {onPowerOn('repo_diagram', repoUrl)}} />
+            </PowerOnButton>
+            <TaskText>
+              <TaskSpan>Clone the repo</TaskSpan>
+              <TaskInput
+                type="text"
+                value={repoUrl}
+                onChange={(e) => setRepoUrl(e.target.value)}
+                placeholder="Enter the URL"
+              />
+              <TaskSpan>and draw some figures !</TaskSpan>
+            </TaskText>
+          </TaskItem>
+          <TaskItem>
+            <PowerOnButton>
+              <FaPowerOff onClick={()=> {onPowerOn('deep_research',topicText)}} />
+            </PowerOnButton>
+            <TaskText>
+              <TaskSpan>Deep research on the topic</TaskSpan>
+              <TaskInput
+                type="text"
+                value={topicText}
+                onChange={(e) => setTopicText(e.target.value)}
+                placeholder="Enter the Topic"
+              />
+              <TaskSpan>and write a report !</TaskSpan>
+            </TaskText>
+          </TaskItem>
+        </TaskList>
     </PowerOnContainer>
   );
 };
