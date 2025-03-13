@@ -103,7 +103,7 @@ const PowerOn: React.FC<PowerOnProps> = ({ onPowerOn }) => {
         <TaskList>
           <TaskItem>
             <PowerOnButton>
-              <FaPowerOff onClick={()=> {onPowerOn('repo_diagram', repoUrl)}} />
+              <FaPowerOff onClick={()=> {onPowerOn('diagram', repoUrl)}} />
             </PowerOnButton>
             <TaskText>
               <TaskSpan>Clone the repo</TaskSpan>
@@ -118,7 +118,7 @@ const PowerOn: React.FC<PowerOnProps> = ({ onPowerOn }) => {
           </TaskItem>
           <TaskItem>
             <PowerOnButton>
-              <FaPowerOff onClick={()=> {onPowerOn('deep_research',topicText)}} />
+              <FaPowerOff onClick={()=> {onPowerOn('search',topicText)}} />
             </PowerOnButton>
             <TaskText>
               <TaskSpan>Deep research on the topic</TaskSpan>

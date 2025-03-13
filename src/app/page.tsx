@@ -48,6 +48,7 @@ export default function Home() {
   
   // 处理开机
   const handlePowerOn = async (task: string, text: string) => {
+    if(!task || !text) return;
     setIsBooting(true);
     fetchSSEData(task, text);
   };
@@ -111,7 +112,7 @@ export default function Home() {
       console.log(`[SSE] 发起SSE连接请求...`);
       
       // 使用 fetch API 替代 EventSource 来支持 POST 方法的 SSE
-      fetch('https://kr4t0n--gitmesh-agent-fastapi-app.modal.run/aexecute', {
+      fetch('https://kr4t0n--meshow-agnet.modal.run/tasks', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -121,8 +122,7 @@ export default function Home() {
           // 强制使用HTTP/1.1协议
           // 'X-HTTP-Version': 'HTTP/1.1'
         },
-        // body: JSON.stringify({ task: task, text: text }),
-        body: JSON.stringify({ site: text }),
+        body: JSON.stringify({ task: task, query: text }),
         // 明确指定不使用HTTP/2
         cache: 'no-store',
         keepalive: true,
